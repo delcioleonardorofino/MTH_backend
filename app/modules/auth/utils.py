@@ -1,7 +1,7 @@
 from fastapi import Request
-from core.oauth import oauth
-from models.user import User
-from models.auth_account import OAuthAccount
+from app.core.oauth import oauth
+from app.models.user import User
+from app.models.auth_account import OAuthAccount
 from sqlalchemy.orm import Session
 
 

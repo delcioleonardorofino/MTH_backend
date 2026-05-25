@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Depends
 from .utils import handle_redirect, handle_user_login
-from core.database import get_db
+from app.core.database import get_db
 from sqlalchemy.orm import Session
 
 router = APIRouter()
