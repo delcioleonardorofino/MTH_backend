@@ -19,5 +19,3 @@ app.include_router(
 def health():
     return {"message": 'alive'}
 
-for route in app.routes:
-    print(route.path, route.name)
