@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
-from modules.auth.router import router as auth_router
+from .modules.auth.router import router as auth_router
 
 
 app = FastAPI()
