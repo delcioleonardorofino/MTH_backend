@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, ForeignKey, DateTime, func, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-from app.models.base import Base
+from .base import Base
 
 class OAuthAccount(Base):
     __tablename__="oauth_accounts"

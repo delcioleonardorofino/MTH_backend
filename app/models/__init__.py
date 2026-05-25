@@ -1,2 +1,2 @@
-from app.models.user import User
-from app.models.auth_account import OAuthAccount
+from .user import User
+from .auth_account import OAuthAccount
