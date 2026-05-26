@@ -4,7 +4,7 @@ from jose import jwt, JWTError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from .database import get_db
-from models.user import User
+from ..models.user import User
 from .config import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
 
 security = HTTPBearer()
