@@ -4,7 +4,7 @@ from .utils import handle_user_login
 from app.core.database import get_db
 from app.core.oauth import SUPPORTED_PROVIDERS, oauth
 
-router = APIRouter()
+router = APIRouter(prefix='auth')
 
 
 @router.get("/login/{provider}")
@@ -15,13 +15,13 @@ async def login_w_provider(provider: str, request: Request):
 
     client = oauth.create_client(provider)
 
-    redirect_uri = request.url_for("callback_function", provider=provider)
+    redirect_uri = request.url_for("oauth_callback_function", provider=provider)
 
     return await client.authorize_redirect(request, redirect_uri)
 
 
-@router.get("/auth/{provider}/callback", name="callback_function")
-async def callback_endpoint(
+@router.get("/{provider}/callback", name="oauth_callback_function")
+async def oauth_callback_endpoint(
     provider: str,
     request: Request,
     db: AsyncSession = Depends(get_db)

@@ -12,6 +12,7 @@ async def handle_user_login(provider: str, request: Request, db: AsyncSession):
 
     # 1. Exchange code for token
     token = await client.authorize_access_token(request)
+    print(token)
     access_token = token.get("access_token")
 
     if not access_token:
