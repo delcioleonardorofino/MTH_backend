@@ -12,7 +12,7 @@ oauth.register(
     access_token_url='https://github.com/login/oauth/access_token',
     api_base_url='https://api.github.com/',
     client_kwargs={
-        "scope":"read:user repo"
+        "scope":"read:user user:email repo"
     }
 )
 

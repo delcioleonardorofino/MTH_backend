@@ -12,7 +12,6 @@ async def handle_user_login(provider: str, request: Request, db: AsyncSession):
 
     # 1. Exchange code for token
     token = await client.authorize_access_token(request)
-    print(token)
     access_token = token.get("access_token")
 
     if not access_token:
@@ -31,13 +30,23 @@ async def handle_user_login(provider: str, request: Request, db: AsyncSession):
 
     if provider == "github":
         provider_account_id = str(user_info["id"])
-        name = user_info["login"]
-        avatar = user_info["avatar_url"]
+        name = user_info.get("login")
+        avatar = user_info.get("avatar_url")
+        email = user_info.get('email')
+
+        if not email:
+            resp = await client.get('user/emails', token=token)
+            emails = resp.json()
+
+            if emails:
+                primary_email = next((e['email'] for e in emails if e['primary']), emails[0]['email'])
+                email = primary_email
 
     elif provider == "google":
         provider_account_id = user_info["sub"]
         name = user_info.get("name")
         avatar = user_info.get("picture")
+        email = user_info.get("email")
 
     else:
         raise HTTPException(status_code=400, detail="Unsupported provider")
@@ -57,8 +66,8 @@ async def handle_user_login(provider: str, request: Request, db: AsyncSession):
         user = await db.get(User, oauth_account.user_id)
 
     # 5. Create new user
-    else:
-        user = User(name=name, avatar_url=avatar)
+        user = User(name=name, avatar_url=avatar, email=email)
+
         db.add(user)
         await db.flush()
 
