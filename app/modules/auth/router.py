@@ -4,7 +4,7 @@ from .utils import handle_user_login
 from app.core.database import get_db
 from app.core.oauth import SUPPORTED_PROVIDERS, oauth
 
-router = APIRouter(prefix='auth')
+router = APIRouter(prefix='/auth')
 
 
 @router.get("/login/{provider}")
