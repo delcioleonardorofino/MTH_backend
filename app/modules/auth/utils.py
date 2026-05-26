@@ -66,7 +66,9 @@ async def handle_user_login(provider: str, request: Request, db: AsyncSession):
         user = await db.get(User, oauth_account.user_id)
 
     # 5. Create new user
+    else:
         user = User(name=name, avatar_url=avatar, email=email)
+        print(user)
 
         db.add(user)
         await db.flush()
