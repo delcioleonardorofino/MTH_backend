@@ -1,8 +1,11 @@
+from uuid import UUID
+
 from fastapi import Request
 from app.core.oauth import oauth
 from app.models.user import User
 from app.models.auth_account import OAuthAccount
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 
 async def handle_redirect(request: Request):
@@ -27,29 +30,34 @@ async def handle_user_login(request: Request, db: Session):
     avatar = user_info['avatar_url']
 
     # Verificar se OAuthAccount ja existe
-    oauth_acount = db.query(OAuthAccount).filter_by(provider=provider, provider_account_id=provider_account_id).first()
+    oauth_acount = await db.query(OAuthAccount).filter_by(provider=provider, provider_account_id=provider_account_id).first()
 
     if oauth_acount:
-        user = db.query(User).filter_by(id=oauth_acount.user_id).first()
+        result = await db.execute(
+        select(User).where(User.id==UUID(oauth_acount.user_id))
+        )
+        user = result.scalar_one_or_none()
 
     else:
         user = User(
-            name=name,
-            avatar_url=avatar
+        name=name,
+        avatar_url=avatar
         )
-        db.add(user)
-        db.flush()
 
-        oauth_acount = OAuthAccount(
+        db.add(user)
+        await db.flush()  # garante user.id
+
+        oauth_account = OAuthAccount(
             user_id=user.id,
             provider=provider,
             provider_account_id=provider_account_id,
             access_token=access_token
         )
-        db.add(oauth_acount)
-    
-    db.commit()
-    db.refresh(user)
+
+        db.add(oauth_account)
+
+    await db.commit()
+    await db.refresh(user)
 
     return {
         'id': str(user_info['id']),
