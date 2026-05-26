@@ -96,6 +96,7 @@ async def handle_user_login(provider: str, request: Request, db: AsyncSession):
         'user' : {
             "id": str(user.id),
             "name": user.name,
+            "email" : user.email,
             "avatar": user.avatar_url
         }
     }
