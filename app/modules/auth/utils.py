@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from fastapi import Request, HTTPException
+from app.core.security import create_access_token
 from app.core.oauth import oauth
 from app.models.user import User
 from app.models.auth_account import OAuthAccount
@@ -84,8 +85,17 @@ async def handle_user_login(provider: str, request: Request, db: AsyncSession):
     await db.commit()
     await db.refresh(user)
 
+    user_token = create_access_token(
+        data = {
+            'sub' : str(user.id)
+        })
+
     return {
-        "id": str(user.id),
-        "name": user.name,
-        "avatar": user.avatar_url,
+        'access_token': user_token,
+        'token_type': 'bearer',
+        'user' : {
+            "id": str(user.id),
+            "name": user.name,
+            "avatar": user.avatar_url
+        }
     }
