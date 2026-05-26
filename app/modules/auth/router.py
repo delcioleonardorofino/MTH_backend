@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from .utils import handle_user_login
 from app.core.database import get_db
 from app.core.oauth import SUPPORTED_PROVIDERS, oauth

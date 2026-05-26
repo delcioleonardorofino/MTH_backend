@@ -1,6 +1,6 @@
 from authlib.integrations.starlette_client import OAuth
 import os
-from .config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
+from .config import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 
 oauth = OAuth()
 
@@ -15,3 +15,13 @@ oauth.register(
         "scope":"read:user repo"
     }
 )
+
+oauth.register(
+    name="google",
+    client_id=GOOGLE_CLIENT_ID,
+    client_secret=GOOGLE_CLIENT_SECRET,
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"},
+)
+
+SUPPORTED_PROVIDERS = { 'google', 'github' }
