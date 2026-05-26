@@ -4,44 +4,59 @@ from fastapi import Request
 from app.core.oauth import oauth
 from app.models.user import User
 from app.models.auth_account import OAuthAccount
-from sqlalchemy.orm import Session
+
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 
 async def handle_redirect(request: Request):
-
-    redirect_uri = request.url_for('github_callback')
+    redirect_uri = request.url_for("github_callback")
     return await oauth.github.authorize_redirect(request, redirect_uri)
 
-async def handle_user_login(request: Request, db: Session):
-    provider = 'github'
 
-    # Fazemos uma troca do code fornecido no redirect do github por access token 
-    token = await oauth.github.authorize_access_token(request) 
-    access_token = token['access_token']
+async def handle_user_login(request: Request, db: AsyncSession):
+    provider = "github"
 
-    # Buscamos o user no github atraves do nosso token e retornamos as infos do user
-    response = await oauth.github.get('user', token=token)
+    # 1. Trocar code por access token
+    token = await oauth.github.authorize_access_token(request)
+    access_token = token["access_token"]
+
+    # 2. Buscar user no GitHub
+    response = await oauth.github.get("user", token=token)
     user_info = response.json()
 
-    # criamos variaveis com o id do provider, name do user e avatar_url
-    provider_account_id = str(user_info['id'])
-    name = user_info['login']
-    avatar = user_info['avatar_url']
+    provider_account_id = str(user_info["id"])
+    name = user_info["login"]
+    avatar = user_info["avatar_url"]
 
-    # Verificar se OAuthAccount ja existe
-    oauth_acount = await db.query(OAuthAccount).filter_by(provider=provider, provider_account_id=provider_account_id).first()
+    # --------------------------------------------------
+    # 3. Buscar OAuthAccount
+    # --------------------------------------------------
+    result = await db.execute(
+        select(OAuthAccount).where(
+            OAuthAccount.provider == provider,
+            OAuthAccount.provider_account_id == provider_account_id
+        )
+    )
 
-    if oauth_acount:
+    oauth_account = result.scalar_one_or_none()
+
+    # --------------------------------------------------
+    # 4. Se já existe
+    # --------------------------------------------------
+    if oauth_account:
         result = await db.execute(
-        select(User).where(User.id==UUID(oauth_acount.user_id))
+            select(User).where(User.id == oauth_account.user_id)
         )
         user = result.scalar_one_or_none()
 
+    # --------------------------------------------------
+    # 5. Se não existe → criar tudo
+    # --------------------------------------------------
     else:
         user = User(
-        name=name,
-        avatar_url=avatar
+            name=name,
+            avatar_url=avatar
         )
 
         db.add(user)
@@ -56,11 +71,14 @@ async def handle_user_login(request: Request, db: Session):
 
         db.add(oauth_account)
 
+    # --------------------------------------------------
+    # 6. commit final
+    # --------------------------------------------------
     await db.commit()
     await db.refresh(user)
 
     return {
-        'id': str(user_info['id']),
-        'name' : user_info['login'],
-        'avatar' : user_info['avatar_url'],
+        "id": str(user.id),
+        "name": user.name,
+        "avatar": user.avatar_url,
     }
