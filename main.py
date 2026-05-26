@@ -1,9 +1,9 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from starlette.middleware.sessions import SessionMiddleware
 from app.modules.auth.router import router as auth_router
 from app.modules.users.router import router as users_router
-
+from app.core.dependencies import get_current_user
 
 app = FastAPI()
 
@@ -21,6 +21,6 @@ app.include_router(
 )
 
 @app.get('/')
-def health():
-    return {"message": 'alive'}
+def health(current_user = Depends(get_current_user)):
+    return {current_user}
 
