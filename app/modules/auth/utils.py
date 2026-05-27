@@ -68,7 +68,7 @@ async def handle_user_login(provider: str, request: Request, db: AsyncSession):
 
     # 5. Create new user
     else:
-        user = User(name=name, avatar_url=avatar, email=email)
+        user = User(name=name, avatar_url=avatar, email=email, is_verified=True)
         print(user)
 
         db.add(user)

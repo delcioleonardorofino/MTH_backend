@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from .database import get_db
 from ..models.user import User
-from .config import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
+from .config import settings 
 
 security = HTTPBearer()
 
@@ -16,8 +16,8 @@ async def get_current_user(db: AsyncSession = Depends(get_db), credentials: HTTP
     try:
         payload = jwt.decode(
             token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM]
         )
         user_id = payload.get('sub')
 

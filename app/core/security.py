@@ -1,12 +1,12 @@
 from jose import jwt
 from datetime import datetime, timedelta
-from .config import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
+from .config import settings
 
 
 def create_access_token(data: dict):
 
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + timedelta(minutes = settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update({
         'exp': expire
@@ -14,9 +14,11 @@ def create_access_token(data: dict):
 
     token = jwt.encode(
         to_encode,
-        SECRET_KEY,
-        algorithm=ALGORITHM
+        settings.SECRET_KEY,
+        algorithm=settings.ALGORITHM
     )
 
     return token
+
+
 

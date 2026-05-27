@@ -24,3 +24,6 @@ app.include_router(
 def health(current_user = Depends(get_current_user)):
     return {current_user}
 
+@app.get('/test1')
+def first_test():
+    return 'Hello!'
