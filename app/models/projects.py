@@ -16,6 +16,8 @@ class Project(Base):
 
     is_published = Column(Boolean, default=False)
 
+    published_at = Column(DateTime(timezone=True), nullable=True)
+
     created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
