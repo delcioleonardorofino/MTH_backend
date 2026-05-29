@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import List
 
 load_dotenv()
 
@@ -21,11 +22,11 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES : int
     DEBUG: bool = False
 
-
     model_config = SettingsConfigDict(
         env_file=env_file,
         extra='ignore'
     )
+
 
 
 settings = Settings()
